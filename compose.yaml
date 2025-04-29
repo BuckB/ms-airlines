@@ -1,19 +1,19 @@
 services:
   mongodb:
-    image: 'mongo:nanoserver-ltsc2022'
+    build:
+      context: ./docker/mongo
+      dockerfile: Dockerfile
+    container_name: mongo-db
+    ports:
+      - '27017:27017'
     env_file: .env
     environment:
       - 'MONGO_INITDB_DATABASE=kafka-book'
       - 'MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME}'
       - 'MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}'
-    ports:
-      - '27017:27017'
-    hostname: mongodb
-    container_name: mongo-db
     restart: on-failure
     volumes:
-      - ./src/main/resources/scripts/init-mongodb.js:/docker-entrypoint-initdb.d/init-mongodb.js:ro
-    command: mongod
+      - ./docker/mongo/scripts:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD", "mongo", "--eval", "rs.status()"]
       interval: 30s
@@ -25,5 +25,4 @@ services:
 
 networks:
   bubble:
-    name: bubble
     driver: bridge
