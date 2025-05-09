@@ -3,26 +3,62 @@ services:
     build:
       context: ./docker/mongo
       dockerfile: Dockerfile
-    container_name: mongo-db
+    container_name: kafka-mongo-db
     ports:
       - '27017:27017'
     env_file: .env
     environment:
-      - 'MONGO_INITDB_DATABASE=kafka-book'
-      - 'MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME}'
-      - 'MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}'
-    restart: on-failure
+      - MONGO_INITDB_DATABASE=kafka-book
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
     volumes:
       - ./docker/mongo/scripts:/docker-entrypoint-initdb.d:ro
-    healthcheck:
-      test: ["CMD", "mongo", "--eval", "rs.status()"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
+      - ~/DSV/mongo/data:/data/db
+    # healthcheck:
+    #   test: ["CMD", "mongo", "--eval", "rs.status()"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 30s
     networks:
-      - bubble
+      bubble:
+        aliases:
+          - mongodb
+
+  mongo-express:
+    image: mongo-express:1.0.2-20-alpine3.19
+    container_name: kafka-mongo-express
+    ports:
+      - '8081:8081'
+    env_file: .env
+    environment:
+      ME_CONFIG_BASICAUTH_USERNAME: ${ME_USERNAME}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${ME_PASSWORD}
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_USERNAME}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_PASSWORD}
+      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongodb:27017/
+    links:
+      - mongodb
+    depends_on:
+      - mongodb
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:8081"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 30s
+    networks:
+      bubble:
 
 networks:
   bubble:
+    name: bubble
     driver: bridge
+
+volumes:
+    data:
+      driver: local
+      driver_opts:
+        type: none
+        device: ~/DSV/mongo/data
+        o: bind
