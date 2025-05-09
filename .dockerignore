@@ -1,0 +1,58 @@
+# This is a Docker ignore file. It specifies files and directories that should be excluded from the Docker build context.
+
+# Ignore Eclipse project files
+**/.classpath
+**/.project
+**/.settings
+
+# Ignore Docker-related files
+**/.dockerignore
+**/Dockerfile*
+**/docker-compose*
+**/compose.y*ml
+
+# Ignore environment variable files to prevent sensitive data exposure
+**/.env*
+
+# Ignore version control files
+**/.git
+**/.gitignore
+
+# Ignore Visual Studio and IDE-specific files
+**/.vs
+**/.vscode
+**/.toolstarget
+
+# Ignore Node.js related files
+**/node_modules
+**/npm-debug.log
+
+# Ignore temporary and build files
+**/target/*
+**/obj
+**/.next
+**/.cache
+**/vendor
+
+# Ignore SonarQube files
+**/.sonar/
+**/.sonarlint/
+
+# Ignore user-specific project files
+**/*.*proj.user
+**/*.dbmdl
+**/*.jfm
+
+# Ignore charts and secrets
+**/charts
+**/secrets.*.y*ml
+**/values.*.y*ml
+
+# Ignore documentation files
+LICENSE
+*.md
+README.md
+
+# Ignore log files
+*.log
+*.tmp
